@@ -2,14 +2,14 @@ import sys
 import os
 import psycopg2
 from psycopg2 import Error
-from config_data.config import USER, PASSWORD, HOST, PORT
+from config_data.config import USER_NAME, PASSWORD, HOST, PORT
 sys.path.append(os.getcwd())
 
 
 def city_database():
     try:
-        connection = psycopg2.connect(user=USER,
-                                      password='OptTovar01',
+        connection = psycopg2.connect(user=USER_NAME,
+                                      password='PASSWORD',
                                       host=HOST,
                                       port=PORT,
                                       database="ParserHH_db")
@@ -37,7 +37,7 @@ def city_database():
 
 def requests():
     try:
-        connection = psycopg2.connect(user=USER,
+        connection = psycopg2.connect(user=USER_NAME,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
@@ -78,7 +78,7 @@ def requests():
 
 def response():
     try:
-        connection = psycopg2.connect(user=USER,
+        connection = psycopg2.connect(user=USER_NAME,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
