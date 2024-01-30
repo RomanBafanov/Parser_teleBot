@@ -50,20 +50,12 @@ def requests():
                                   ID_CITY INTEGER NOT NULL,
                                   JOB_TITLE VARCHAR NOT NULL,
                                   DATE_REQUEST DATE,
-                                  FOREIGN KEY (ID_CITY) REFERENCES cities (ID_CITY))
+                                  FOREIGN KEY (ID_CITY) REFERENCES cities (ID))
                                    '''
 
         cursor.execute(create_table_query)
         connection.commit()
         print("Таблица requests успешно создана в PostgreSQL")
-
-        cursor = connection.cursor()
-
-        alter_orders_table_query = '''ALTER TABLE requests
-                ADD CONSTRAINT cities
-                FOREIGN KEY (ID_CITY) REFERENCES cities (ID_CITY);'''
-
-        cursor.execute(alter_orders_table_query)
         print("Связь между таблицами 'cities' и 'requests' успешно установлена")
 
         connection.commit()
@@ -120,6 +112,6 @@ def response():
             print("Соединение с PostgreSQL закрыто")
 
 
-# city_database()
+city_database()
 requests()
 response()
