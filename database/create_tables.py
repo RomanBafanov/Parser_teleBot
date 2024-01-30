@@ -2,25 +2,25 @@ import sys
 import os
 import psycopg2
 from psycopg2 import Error
-from config_data.config import USER_NAME, PASSWORD, HOST, PORT
+from config_data.config import USER, PASSWORD, HOST, PORT
 sys.path.append(os.getcwd())
 
 
 def city_database():
     try:
-        connection = psycopg2.connect(user=USER_NAME,
-                                      password='PASSWORD',
+        connection = psycopg2.connect(user=USER,
+                                      password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="ParserHH_db")
+                                      database="parserhh_db")
 
         cursor = connection.cursor()
 
         create_table_query = '''CREATE TABLE cities
                               (ID BIGSERIAL PRIMARY KEY NOT NULL,
                               ID_CITY INTEGER NOT NULL,
-                              CITY VARCHAR NOT NULL,
-                              ) '''
+                              CITY VARCHAR NOT NULL)
+                               '''
 
         cursor.execute(create_table_query)
         connection.commit()
@@ -37,11 +37,11 @@ def city_database():
 
 def requests():
     try:
-        connection = psycopg2.connect(user=USER_NAME,
+        connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="ParserHH_db")
+                                      database="parserhh_db")
 
         cursor = connection.cursor()
 
@@ -50,7 +50,8 @@ def requests():
                                   ID_CITY INTEGER NOT NULL,
                                   JOB_TITLE VARCHAR NOT NULL,
                                   DATE_REQUEST DATE,
-                                  FOREIGN KEY (ID_CITY) REFERENCES cities (ID_CITY)); '''
+                                  FOREIGN KEY (ID_CITY) REFERENCES cities (ID_CITY))
+                                   '''
 
         cursor.execute(create_table_query)
         connection.commit()
@@ -78,11 +79,11 @@ def requests():
 
 def response():
     try:
-        connection = psycopg2.connect(user=USER_NAME,
+        connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="ParserHH_db")
+                                      database="parserhh_db")
 
         cursor = connection.cursor()
 
@@ -92,7 +93,8 @@ def response():
                                   COMPANY_NAME VARCHAR,
                                   SITE VARCHAR NOT NULL,
                                   TELEPHONE VARCHAR NOT NULL,
-                                  FOREIGN KEY (ID_REQUEST) REFERENCES requests (ID)); '''
+                                  FOREIGN KEY (ID_REQUEST) REFERENCES requests (ID))
+                                   '''
 
         cursor.execute(create_table_query)
         connection.commit()
@@ -118,6 +120,6 @@ def response():
             print("Соединение с PostgreSQL закрыто")
 
 
-city_database()
+# city_database()
 requests()
 response()
