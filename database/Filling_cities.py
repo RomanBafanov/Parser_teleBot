@@ -9,7 +9,9 @@ from config_data.config import USER, PASSWORD, HOST, PORT
 sys.path.append(os.getcwd())
 
 
-def cities(id_city, city):
+def cities():
+    connection = None
+    cursor = None
     try:
         # Подключиться к существующей базе данных
         connection = psycopg2.connect(user=USER,
@@ -55,4 +57,4 @@ city = {'1': 'Москва', '2': 'Санкт-Петербург', '3': 'Ека�
         '130': 'Севастополь', '131': 'Симферополь'}
 
 for id_city, city in city.items():
-    cities(id_city, city)
+    cities()
