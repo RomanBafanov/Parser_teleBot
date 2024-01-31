@@ -4,6 +4,9 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from config_data.config import USER, PASSWORD, HOST, PORT
 
 
+connection = None
+cursor = None
+
 try:
     # Подключение к существующей базе данных
     connection = psycopg2.connect(user=USER,
