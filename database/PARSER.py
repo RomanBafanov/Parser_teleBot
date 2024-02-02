@@ -16,13 +16,12 @@ def get_employer_info(url):
 
 
 def get_vacancies_hh(keyword, area):
-    keyword = {keyword}
-    area = {area}
     url = 'https://api.hh.ru/vacancies'
     vacancies_info = []
-
+    period = 31
+    per_page = 100
     today = datetime.now().date()
-    period_start = today - timedelta(days=2)
+    period_start = today - timedelta(days=period)
 
     page = 0
     while True:
@@ -30,7 +29,7 @@ def get_vacancies_hh(keyword, area):
             'text': keyword,
             'area': area,
             'date_from': period_start.isoformat(),
-            'per_page': 50,
+            'per_page': per_page,
             'page': page
         }
         response = requests.get(url, params=params)
