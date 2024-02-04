@@ -2,12 +2,14 @@ from aiogram import types
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.cities import search_cities
-from loader import dp
+from loader import dp, bot
 from utils.statesform import StepsForm
 from database.PARSER import get_vacancies_hh, filter_and_create_dict
+from aiogram.types import FSInputFile
 from aiogram import F
 import pandas as pd
 import openpyxl
+import os.path
 
 
 AREA = None
@@ -84,28 +86,34 @@ async def get_data(callback: types.CallbackQuery):
     global AREA
     await callback.message.answer("processing... please wait")
     try:
-        vacancies_data = get_vacancies_hh(KEYWORD, AREA)  # Передаем переменные
+        vacancies_data = get_vacancies_hh(KEYWORD, AREA)
         result = filter_and_create_dict(vacancies_data)
-        print(result)
-        # df = pd.DataFrame([result])
-        # df.to_excel('output.xlsx', index=False)
-        # wb = openpyxl.load_workbook('output.xlsx')
-        #
-        # # Выбираем активный лист (первый лист в книге)
-        # sheet = wb.active
-        #
-        # # Устанавливаем ширину столбцов
-        # sheet.column_dimensions['A'].width = 25
-        # sheet.column_dimensions['B'].width = 20
-        # sheet.column_dimensions['C'].width = 20
-        #
-        # # Устанавливаем высоту строк
-        # sheet.row_dimensions[1].height = 15
-        # sheet.row_dimensions[2].height = 15
-        #
-        # # Сохраняем изменения в файл
-        # wb.save('output.xlsx')
 
-        await callback.message.answer("Результаты выведены в терминал")
+        # Создаем DataFrame из списка словарей
+        df = pd.DataFrame(list(result.values()), index=result.keys(), columns=['Сайт', 'Телефон'])
+
+        # Сохраняем DataFrame в Excel
+        df.to_excel('output.xlsx', index_label='Компания')
+
+        # Открываем файл Excel
+        wb = openpyxl.load_workbook('output.xlsx')
+
+        # Выбираем активный лист (первый лист в книге)
+        sheet = wb.active
+
+        # Устанавливаем ширину столбцов
+        sheet.column_dimensions['A'].width = 30
+        sheet.column_dimensions['B'].width = 30
+        sheet.column_dimensions['C'].width = 30
+
+        # Устанавливаем высоту строк
+        sheet.row_dimensions[1].height = 15
+        sheet.row_dimensions[2].height = 15
+
+        # Сохраняем изменения в файл
+        wb.save('output.xlsx')
+        absolute_path = os.path.abspath("output.xlsx")
+        document = FSInputFile(absolute_path)
+        await bot.send_document(chat_id=callback.from_user.id, document=document)
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
