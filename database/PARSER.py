@@ -64,7 +64,8 @@ def filter_and_create_dict(vacancies):
             pattern = '"tel:(.*?)"'
             match = re.search(pattern, string)
             if match is not None:
-                company_final[company['Компания']] = {
+                company_final = {
+                    'Компания': company['Компания'],
                     'Сайт': company['Сайт'],
                     'Телефон': match.group(1)
                 }
