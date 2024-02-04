@@ -56,6 +56,7 @@ def get_vacancies_hh(keyword, area):
 def filter_and_create_dict(vacancies):
     filtered_companies = [company for company in vacancies if company.get('Сайт') != '']
     company_final = {}
+    count_companies = 0
     for company in filtered_companies:
         try:
             response = requests.get(company['Сайт'])
@@ -64,11 +65,12 @@ def filter_and_create_dict(vacancies):
             pattern = '"tel:(.*?)"'
             match = re.search(pattern, string)
             if match is not None:
-                company_final = {
-                    'Компания': company['Компания'],
+                company_final[company['Компания']] = {
                     'Сайт': company['Сайт'],
                     'Телефон': match.group(1)
                 }
+                count_companies += 1
         except requests.RequestException as error:
             pass
+    print("Количество компаний:", count_companies)
     return company_final
