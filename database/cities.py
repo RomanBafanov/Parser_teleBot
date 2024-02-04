@@ -18,7 +18,7 @@ def search_cities():
                                       database="parserhh_db")
         cursor = connection.cursor()
         cursor.execute(f'''SELECT id_city, city 
-        FROM cities''')
+                            FROM cities''')
         record = cursor.fetchall()
         connection.commit()
     except (Exception, Error) as error:
