@@ -10,7 +10,8 @@ from aiogram import F
 import pandas as pd
 import openpyxl
 import os.path
-
+import datetime
+from database.requests import *
 
 AREA = None
 KEYWORD = None
@@ -74,20 +75,22 @@ async def search_vacancy_name2(message: types.Message, state: FSMContext):
         text="Назад", callback_data="Парсинг")
     )
     builder.row(types.InlineKeyboardButton(
-        text="Продолжить", callback_data="Парс")
+        text="Продолжить", callback_data="get_data")
     )
     await message.answer(f"Введенная вакансия  - {KEYWORD}", reply_markup=builder.as_markup())
     await state.clear()
 
 
-@dp.callback_query(F.data == "Парс")
+@dp.callback_query(F.data == "get_data")
 async def get_data(callback: types.CallbackQuery):
     global KEYWORD
     global AREA
+    date = datetime.datetime.now()
     await callback.message.answer("processing... please wait")
     try:
         vacancies_data = get_vacancies_hh(KEYWORD, AREA)
         result = filter_and_create_dict(vacancies_data)
+        create_requests(AREA, KEYWORD, date)
 
         # Создаем DataFrame из списка словарей
         df = pd.DataFrame(list(result.values()), index=result.keys(), columns=['Сайт', 'Телефон'])
