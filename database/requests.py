@@ -10,14 +10,14 @@ def create_requests(area, keyword, date):
     connection = None
     cursor = None
     try:
-        # Connect to an existing database
         connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
                                       database="parserhh_db")
         cursor = connection.cursor()
-        insert_query = """INSERT INTO requests(id_city, job_title, date_request) VALUES(%s, %s, %s) """
+        insert_query = """INSERT INTO requests(id_city, job_title, date_request) VALUES(%s, %s, %s)
+                       """
 
         cursor.execute(insert_query, (area, keyword, date))
         connection.commit()
