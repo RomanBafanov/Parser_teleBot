@@ -12,6 +12,8 @@ import openpyxl
 import os.path
 import datetime
 from database.requests import *
+from database.response import *
+
 
 AREA = None
 KEYWORD = None
@@ -90,7 +92,10 @@ async def get_data(callback: types.CallbackQuery):
     try:
         vacancies_data = get_vacancies_hh(KEYWORD, AREA)
         result = filter_and_create_dict(vacancies_data)
-        create_requests(AREA, KEYWORD, date)
+        id_request = create_requests(AREA, KEYWORD, date)
+        print(id_request)
+        for company, company_info in result.items():
+            insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
 
         # Создаем DataFrame из списка словарей
         df = pd.DataFrame(list(result.values()), index=result.keys(), columns=['Сайт', 'Телефон'])
