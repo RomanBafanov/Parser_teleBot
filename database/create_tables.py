@@ -22,7 +22,7 @@ def create_all_tables():
 
     create_requests_table_query = '''CREATE TABLE requests
                                   (ID BIGSERIAL PRIMARY KEY NOT NULL,
-                                  ID_CITY INTEGER NOT NULL UNIQUE,
+                                  ID_CITY INTEGER NOT NULL ,
                                   JOB_TITLE VARCHAR NOT NULL,
                                   DATE_REQUEST DATE,
                                   FOREIGN KEY (ID_CITY) REFERENCES cities (ID_CITY))
