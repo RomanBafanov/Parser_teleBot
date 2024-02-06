@@ -1,18 +1,25 @@
 from datetime import datetime, timedelta
 import requests
 import re
+from multiprocessing import Pool
+from requests_cache import install_cache
+
+install_cache('hh_cache')
 
 
 def get_employer_info(url):
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
         employer_info = response.json()
-        return {
-            "Компания": employer_info["name"],
-            "Сайт": employer_info.get("site_url", "")
-        }
-    else:
+    except requests.RequestException as error:
+        print(f"Ошибка при запросе к {url}: {error}")
         return None
+
+    return {
+        "Компания": employer_info["name"],
+        "Сайт": employer_info.get("site_url", "")
+    }
 
 
 def get_vacancies_hh(keyword, area):
@@ -30,20 +37,20 @@ def get_vacancies_hh(keyword, area):
             'area': area,
             'date_from': period_start.isoformat(),
             'per_page': per_page,
-            'page': page
+            'page': page,
+            'only_with_company': True
         }
+
         response = requests.get(url, params=params)
         response.raise_for_status()
 
         page_payload = response.json()
         print(f"Processing page {page}, total pages: {page_payload['pages']}")
 
-        for vacancy in page_payload["items"]:
-            if "employer" in vacancy and "url" in vacancy["employer"]:
-                url_employer = vacancy["employer"]["url"]
-                company_data = get_employer_info(url_employer)
-                if company_data:
-                    vacancies_info.append(company_data)
+        with Pool() as pool:
+            vacancies_info.extend(pool.map(get_employer_info,
+                                           [vacancy["employer"]["url"] for vacancy in page_payload["items"]
+                                            if "employer" in vacancy and "url" in vacancy["employer"]]))
 
         if page < page_payload["pages"] - 1:
             page += 1
@@ -54,7 +61,7 @@ def get_vacancies_hh(keyword, area):
 
 
 def filter_and_create_dict(vacancies):
-    filtered_companies = [company for company in vacancies if company.get('Сайт') != '']
+    filtered_companies = (company for company in vacancies if company.get('Сайт') != '')
     company_final = {}
     count_companies = 0
     for company in filtered_companies:
@@ -74,3 +81,8 @@ def filter_and_create_dict(vacancies):
             pass
     print("Количество компаний:", count_companies)
     return company_final
+
+
+def get_companies(keyword, area):
+    vacancies = get_vacancies_hh(keyword, area)
+    return filter_and_create_dict(vacancies)
