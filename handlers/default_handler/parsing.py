@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.cities import search_cities
 from loader import dp, bot
 from utils.statesform import StepsForm
-from database.PARSER import get_vacancies_hh, filter_and_create_dict
+from utils.parser import get_companies
 from aiogram.types import FSInputFile
 from aiogram import F
 import pandas as pd
@@ -88,17 +88,17 @@ async def get_data(callback: types.CallbackQuery):
     global KEYWORD
     global AREA
     date = datetime.datetime.now()
-    await callback.message.answer("processing... please wait")
+    await callback.message.answer("Обработка данных с ...\n"
+                                  "Пожалуйста подождите\n")
     try:
-        vacancies_data = get_vacancies_hh(KEYWORD, AREA)
-        result = filter_and_create_dict(vacancies_data)
+        companies = get_companies(KEYWORD, AREA)
         id_request = create_requests(AREA, KEYWORD, date)
-        print(id_request)
-        for company, company_info in result.items():
+
+        for company, company_info in companies.items():
             insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
 
         # Создаем DataFrame из списка словарей
-        df = pd.DataFrame(list(result.values()), index=result.keys(), columns=['Сайт', 'Телефон'])
+        df = pd.DataFrame(list(companies.values()), index=companies.keys(), columns=['Сайт', 'Телефон'])
 
         # Сохраняем DataFrame в Excel
         df.to_excel('output.xlsx', index_label='Компания')

@@ -21,6 +21,12 @@ def create_requests(area, keyword, date):
 
         cursor.execute(insert_query, (area, keyword, date))
         connection.commit()
+        insert_query = f""" SELECT ID from requests ORDER BY ID DESC"""
+
+        cursor.execute(insert_query)
+        record = cursor.fetchall()
+        connection.commit()
+        id = record[0][0]
 
     except (Exception, Error) as error:
         print("Error while working with PostgreSQL:", error)
@@ -29,3 +35,4 @@ def create_requests(area, keyword, date):
             cursor.close()
             connection.close()
             print("Connection to PostgreSQL closed")
+    return id
