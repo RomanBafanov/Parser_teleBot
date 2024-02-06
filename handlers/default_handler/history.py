@@ -85,34 +85,7 @@ async def search_history(callback: types.CallbackQuery):
     try:
         response_history = search_response_history(AREA, KEYWORD)
         print(response_history)
-        # for company, company_info in companies.items():
-        #     insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
-        #
-        # # Создаем DataFrame из списка словарей
-        # df = pd.DataFrame(list(companies.values()), index=companies.keys(), columns=['Сайт', 'Телефон'])
-        #
-        # # Сохраняем DataFrame в Excel
-        # df.to_excel('output.xlsx', index_label='Компания')
-        #
-        # # Открываем файл Excel
-        # wb = openpyxl.load_workbook('output.xlsx')
-        #
-        # # Выбираем активный лист (первый лист в книге)
-        # sheet = wb.active
-        #
-        # # Устанавливаем ширину столбцов
-        # sheet.column_dimensions['A'].width = 30
-        # sheet.column_dimensions['B'].width = 30
-        # sheet.column_dimensions['C'].width = 30
-        #
-        # # Устанавливаем высоту строк
-        # sheet.row_dimensions[1].height = 15
-        # sheet.row_dimensions[2].height = 15
-        #
-        # # Сохраняем изменения в файл
-        # wb.save('output.xlsx')
-        # absolute_path = os.path.abspath("output.xlsx")
-        # document = FSInputFile(absolute_path)
+
         await callback.message.answer("yytytyy")
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
