@@ -6,7 +6,7 @@ from config_data.config import USER, PASSWORD, HOST, PORT
 sys.path.append(os.getcwd())
 
 
-def create_requests(area, keyword, date):
+def insert_requests_data(area, keyword, date):
     connection = None
     cursor = None
     try:

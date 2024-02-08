@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.cities import search_cities
 from loader import dp, bot
 from utils.statesform import StepsForm
-from utils.parser import get_companies
+from parser import get_companies
 from aiogram.types import FSInputFile
 from aiogram import F
 import pandas as pd
@@ -88,12 +88,11 @@ async def get_data(callback: types.CallbackQuery):
     global KEYWORD
     global AREA
     date = datetime.datetime.now()
-    await callback.message.answer("Обработка данных с ...\n"
+    await callback.message.answer("Обработка данных ...\n"
                                   "Пожалуйста подождите\n")
     try:
         companies = get_companies(KEYWORD, AREA)
-        id_request = create_requests(AREA, KEYWORD, date)
-
+        id_request = insert_requests_data(AREA, KEYWORD, date)
         for company, company_info in companies.items():
             insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
 

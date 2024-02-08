@@ -40,9 +40,7 @@ def insert_response_data(id_request, company_name, site, telephone):
             print("Connection to PostgreSQL closed")
 
 
-def search_response_history(area, keyword):
-    print(f"Значение переменной area: {area}")
-    print(f"Значение переменной keyword: {keyword}")
+def search_response_history(city_code, title_job):
     # logging.info(f"Вызов функции search_response_history с аргументами: keyword={keyword}, area={area}")
     # area = 60
     # keyword = 'Повар'
@@ -61,11 +59,11 @@ def search_response_history(area, keyword):
         SELECT company_name, site, telephone
         FROM response, requests
         WHERE response.id_request = requests.id
-        AND requests.id_city = {area}
-        AND requests.job_title = '{keyword}'
+        AND requests.id_city = {city_code}
+        AND requests.job_title = '{title_job}'
         """
 
-        cursor.execute(select_query, (area, keyword))
+        cursor.execute(select_query, (city_code, title_job))
         result = cursor.fetchall()
         return result  # Вернуть результаты запроса
 
