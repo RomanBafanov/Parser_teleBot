@@ -9,14 +9,7 @@ from database.response import *
 from database.cities import search_cities
 from openpyxl import Workbook
 import os.path
-# import logging
 
-
-# logging.basicConfig(
-#     level=logging.DEBUG,
-#     format="%(asctime)s %(levelname)-8s %(message)s",
-#     datefmt="%Y-%m-%d %H:%M:%S",
-# )
 
 CITY_CODE = None
 TITLE_JOB = None
@@ -47,7 +40,6 @@ async def search_id_city(callback: types.CallbackQuery):
         id_city = results[0]
         city = results[1]
         message += f"код : {id_city}  город: {city}\n\n"
-
     await callback.message.answer(message, reply_markup=builder.as_markup())
 
 
@@ -67,14 +59,16 @@ async def search_city_code(message: types.Message, state: FSMContext):
     )
     await message.answer(f"Введенный код города - {CITY_CODE}")
     await message.answer(
-        f' Введите название вакансии: (например, Python-разработчик)', reply_markup=builder.as_markup())
+        f' Введите название вакансии: (например, Python-разработчик)',
+        reply_markup=builder.as_markup()
+    )
     await state.set_state(StepsForm.GET_VACANCY_HISTORY)
 
 
 @dp.message(StepsForm.GET_VACANCY_HISTORY)
 async def search_vacancy_name2(message: types.Message, state: FSMContext):
     global TITLE_JOB
-    TITLE_JOB = message.text
+    TITLE_JOB = message.text.capitalize()
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="История")
@@ -92,39 +86,52 @@ async def get_data_history(callback: types.CallbackQuery):
                                   "Пожалуйста подождите!\n")
 
     try:
-        # print(f"Значение переменной CITY_CODE: {CITY_CODE}")
-        # print(f"Значение переменной TITLE_JOB: {TITLE_JOB}")
         result = search_response_history1(CITY_CODE, TITLE_JOB)
+        if len(result) == 0:
 
-        wb = Workbook()
+            builder = InlineKeyboardBuilder()
+            builder.row(types.InlineKeyboardButton(
+                text="Назад", callback_data="История")
+            )
+            builder.row(types.InlineKeyboardButton(
+                text="Парсинг", callback_data="Парсинг")
+            )
 
-        sheet = wb.active
+            await callback.message.answer(
+                f' К сожалению, в базе данных отсутствуют сохранённые данные для указанного города и вакансии.')
+            await callback.message.answer(f'Перейдите в раздел "Парсинг".', reply_markup=builder.as_markup())
 
-        sheet.cell(row=1, column=1).value = "Компания"
-        sheet.cell(row=1, column=2).value = "Сайт"
-        sheet.cell(row=1, column=3).value = "Телефон"
+        else:
 
-        last_row = sheet.max_row + 1  # Определение номера строки для начала заполнения данных
-        for row_index, row in enumerate(result, start=last_row):
-            company, website, phone_number = row
-            sheet.cell(row=row_index, column=1).value = company
-            sheet.cell(row=row_index, column=2).value = website
-            sheet.cell(row=row_index, column=3).value = phone_number
+            wb = Workbook()
 
-        for column in sheet.columns:
-            max_length = 0
-            for cell in column:
-                try:
-                    if len(str(cell.value)) > max_length:
-                        max_length = len(str(cell.value))
-                except Exception as e:
-                    await callback.message.answer(f"Ошибка: {e}")
-            adjusted_width = (max_length + 2)
-            sheet.column_dimensions[column[0].column_letter].width = adjusted_width
+            sheet = wb.active
 
-        wb.save("history.xlsx")
-        absolute_path = os.path.abspath("output.xlsx")
-        document = FSInputFile(absolute_path)
-        await bot.send_document(chat_id=callback.from_user.id, document=document)
+            sheet.cell(row=1, column=1).value = "Компания"
+            sheet.cell(row=1, column=2).value = "Сайт"
+            sheet.cell(row=1, column=3).value = "Телефон"
+
+            last_row = sheet.max_row + 1  # Определение номера строки для начала заполнения данных
+            for row_index, row in enumerate(result, start=last_row):
+                company, website, phone_number = row
+                sheet.cell(row=row_index, column=1).value = company
+                sheet.cell(row=row_index, column=2).value = website
+                sheet.cell(row=row_index, column=3).value = phone_number
+
+            for column in sheet.columns:
+                max_length = 0
+                for cell in column:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except Exception as e:
+                        await callback.message.answer(f"Ошибка: {e}")
+                adjusted_width = (max_length + 2)
+                sheet.column_dimensions[column[0].column_letter].width = adjusted_width
+
+            wb.save("pars_history.xlsx")
+            absolute_path = os.path.abspath("pars_history.xlsx")
+            document = FSInputFile(absolute_path)
+            await bot.send_document(chat_id=callback.from_user.id, document=document)
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
