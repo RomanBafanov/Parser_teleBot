@@ -71,7 +71,7 @@ async def search_city_code(message: types.Message, state: FSMContext):
 @dp.message(StepsForm.GET_VACANCY)
 async def search_vacancy_name2(message: types.Message, state: FSMContext):
     global KEYWORD
-    KEYWORD = message.text
+    KEYWORD = message.text.capitalize()
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="Парсинг")
