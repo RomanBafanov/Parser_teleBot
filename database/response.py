@@ -10,7 +10,6 @@ sys.path.append(os.getcwd())
 def insert_response_data(id_request, company_name, site, telephone):
     connection = None
     cursor = None
-
     try:
         connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
@@ -73,3 +72,8 @@ def search_response_history(city_code, title_job):
         if connection:
             connection.close()
             print("Connection to PostgreSQL closed")
+
+
+def search_response_history1(city_code, title_job):
+    result = search_response_history(city_code, title_job)
+    return result
