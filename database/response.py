@@ -1,6 +1,5 @@
 import sys
 import os
-import logging
 import psycopg2
 from psycopg2 import Error
 from config_data.config import USER, PASSWORD, HOST, PORT
@@ -8,8 +7,10 @@ sys.path.append(os.getcwd())
 
 
 def insert_response_data(id_request, company_name, site, telephone):
+
     connection = None
     cursor = None
+
     try:
         connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
@@ -30,7 +31,6 @@ def insert_response_data(id_request, company_name, site, telephone):
         raise
 
     finally:
-        # Close database resources
         if cursor:
             cursor.close()
         if connection:
@@ -39,15 +39,16 @@ def insert_response_data(id_request, company_name, site, telephone):
 
 
 def search_response_history(city_code, title_job):
+
     connection = None
     cursor = None
+
     try:
         connection = psycopg2.connect(user=USER,
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
                                       database="parserhh_db")
-        logging.debug("Выполнен запрос к базе данных")
         cursor = connection.cursor()
         select_query = f"""
         SELECT company_name, site, telephone
@@ -59,14 +60,13 @@ def search_response_history(city_code, title_job):
 
         cursor.execute(select_query, (city_code, title_job))
         result = cursor.fetchall()
-        return result  # Вернуть результаты запроса
+        return result
 
     except (Exception, Error) as error:
         print("Error while working with PostgreSQL:", error)
         raise
 
     finally:
-        # Close database resources
         if cursor:
             cursor.close()
         if connection:
