@@ -5,7 +5,7 @@ from loader import dp, bot
 from utils.statesform import StepsForm
 from aiogram import F
 from aiogram.types import FSInputFile
-from database.response import search_response_history
+from database.response import *
 from database.cities import search_cities
 from openpyxl import Workbook
 import os.path
@@ -94,7 +94,7 @@ async def get_data_history(callback: types.CallbackQuery):
     try:
         # print(f"Значение переменной CITY_CODE: {CITY_CODE}")
         # print(f"Значение переменной TITLE_JOB: {TITLE_JOB}")
-        result = search_response_history(CITY_CODE, TITLE_JOB)
+        result = search_response_history1(CITY_CODE, TITLE_JOB)
 
         wb = Workbook()
 
@@ -117,8 +117,8 @@ async def get_data_history(callback: types.CallbackQuery):
                 try:
                     if len(str(cell.value)) > max_length:
                         max_length = len(str(cell.value))
-                except:
-                    pass
+                except Exception as e:
+                    await callback.message.answer(f"Ошибка: {e}")
             adjusted_width = (max_length + 2)
             sheet.column_dimensions[column[0].column_letter].width = adjusted_width
 
