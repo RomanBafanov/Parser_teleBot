@@ -92,8 +92,8 @@ async def get_data_history(callback: types.CallbackQuery):
                                   "Пожалуйста подождите!\n")
 
     try:
-        print(f"Значение переменной AREA1: {CITY_CODE}")
-        print(f"Значение переменной KEYWORD1: {TITLE_JOB}")
+        # print(f"Значение переменной CITY_CODE: {CITY_CODE}")
+        # print(f"Значение переменной TITLE_JOB: {TITLE_JOB}")
         result = search_response_history(CITY_CODE, TITLE_JOB)
 
         wb = Workbook()
@@ -111,11 +111,10 @@ async def get_data_history(callback: types.CallbackQuery):
             sheet.cell(row=row_index, column=2).value = website
             sheet.cell(row=row_index, column=3).value = phone_number
 
-        # После заполнения данных настраиваем ширину столбцов и сохраняем файл
         for column in sheet.columns:
             max_length = 0
             for cell in column:
-                try:  # Необходимо для избежания ошибок при обработке пустых ячеек
+                try:
                     if len(str(cell.value)) > max_length:
                         max_length = len(str(cell.value))
                 except:
