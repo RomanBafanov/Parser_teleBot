@@ -91,6 +91,7 @@ async def get_data(callback: types.CallbackQuery):
     await callback.message.answer("Обработка данных ...\n"
                                   "Пожалуйста подождите\n")
     try:
+
         companies = get_companies(KEYWORD, AREA)
         id_request = insert_requests_data(AREA, KEYWORD, date)
         for company, company_info in companies.items():
