@@ -122,6 +122,6 @@ async def get_data(callback: types.CallbackQuery):
         wb.save('output.xlsx')
         absolute_path = os.path.abspath("output.xlsx")
         document = FSInputFile(absolute_path)
-        await bot.send_document(chat_id=callback.from_user.id, document=document)
+        await bot.send_document(chat_id=callback.from_user.id, document=document, timeout=10)
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
