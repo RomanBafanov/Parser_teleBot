@@ -25,7 +25,7 @@ def get_employer_info(url):
 def get_vacancies_hh(keyword, area):
     url = 'https://api.hh.ru/vacancies'
     vacancies_info = []
-    period = 31
+    period = 30
     per_page = 100
     today = datetime.now().date()
     period_start = today - timedelta(days=period)
@@ -64,21 +64,34 @@ def filter_and_create_dict(vacancies):
     filtered_companies = (company for company in vacancies if company.get('Сайт') != '')
     company_final = {}
     count_companies = 0
+
     for company in filtered_companies:
         try:
             response = requests.get(company['Сайт'])
             response.raise_for_status()
+
             string = response.text
             pattern = '"tel:(.*?)"'
             match = re.search(pattern, string)
-            if match is not None:
-                company_final[company['Компания']] = {
-                    'Сайт': company['Сайт'],
-                    'Телефон': match.group(1)
-                }
-                count_companies += 1
+
+            if match:
+                phone_number = match.group(1)
+
+                # Проверка на null и пустую строку
+                if phone_number and phone_number.strip():
+                    company_final[company['Компания']] = {
+                        'Сайт': company['Сайт'],
+                        'Телефон': phone_number
+                    }
+                    count_companies += 1
+                else:
+                    # Обработка null или пустой строки
+                    print(f"Не найден телефонный номер на сайте компании {company['Компания']}")
+
         except requests.RequestException as error:
-            pass
+            # Обработка ошибок запросов
+            print(f"Ошибка при запросе к сайту компании {company['Компания']}: {error}")
+
     print("Количество компаний:", count_companies)
     return company_final
 

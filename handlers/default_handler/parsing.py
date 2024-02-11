@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database.cities import search_cities
 from loader import dp, bot
 from utils.statesform import StepsForm
-from utils.parser import get_companies
+from parser import get_companies
 from aiogram.types import FSInputFile
 from aiogram import F
 import pandas as pd
@@ -71,7 +71,7 @@ async def search_city_code(message: types.Message, state: FSMContext):
 @dp.message(StepsForm.GET_VACANCY)
 async def search_vacancy_name2(message: types.Message, state: FSMContext):
     global KEYWORD
-    KEYWORD = message.text
+    KEYWORD = message.text.capitalize()
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="Парсинг")
@@ -88,12 +88,12 @@ async def get_data(callback: types.CallbackQuery):
     global KEYWORD
     global AREA
     date = datetime.datetime.now()
-    await callback.message.answer("Обработка данных с ...\n"
+    await callback.message.answer("Обработка данных ...\n"
                                   "Пожалуйста подождите\n")
     try:
-        companies = get_companies(KEYWORD, AREA)
-        id_request = create_requests(AREA, KEYWORD, date)
 
+        companies = get_companies(KEYWORD, AREA)
+        id_request = insert_requests_data(AREA, KEYWORD, date)
         for company, company_info in companies.items():
             insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
 
@@ -122,6 +122,6 @@ async def get_data(callback: types.CallbackQuery):
         wb.save('output.xlsx')
         absolute_path = os.path.abspath("output.xlsx")
         document = FSInputFile(absolute_path)
-        await bot.send_document(chat_id=callback.from_user.id, document=document)
+        await bot.send_document(chat_id=callback.from_user.id, document=document, timeout=10)
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
