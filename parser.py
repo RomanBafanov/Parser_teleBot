@@ -2,10 +2,6 @@ from datetime import datetime, timedelta
 import requests
 import re
 from multiprocessing import Pool
-from requests_cache import install_cache
-
-install_cache('hh_cache')
-
 
 def get_employer_info(url):
     try:
