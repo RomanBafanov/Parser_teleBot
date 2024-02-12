@@ -13,14 +13,6 @@ import os.path
 import datetime
 from database.requests import *
 from database.response import *
-import logging
-
-
-logging.basicConfig(
-    filename='bot.log',  # Имя файла для записи логов
-    level=logging.INFO,  # Уровень логирования (INFO, DEBUG, WARNING, ERROR, CRITICAL)
-    format='%(asctime)s - %(levelname)s - %(message)s'  # Формат сообщений в логе
-)
 
 
 AREA = None
@@ -66,7 +58,6 @@ async def get_vacancies(callback: types.CallbackQuery, state: FSMContext):
 async def search_city_code(message: types.Message, state: FSMContext):
     global AREA
     AREA = message.text
-    logging.info("Запрос на получение AREA от пользователя %s", message.from_user.id)
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="Парсинг")
@@ -81,7 +72,6 @@ async def search_city_code(message: types.Message, state: FSMContext):
 async def search_vacancy_name2(message: types.Message, state: FSMContext):
     global KEYWORD
     KEYWORD = message.text.capitalize()
-    logging.info("Запрос на получение KEYWORD от пользователя %s", message.from_user.id)
     builder = InlineKeyboardBuilder()
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="Парсинг")
@@ -98,28 +88,23 @@ async def get_data(callback: types.CallbackQuery):
     global KEYWORD
     global AREA
     date = datetime.datetime.now()
-    logging.info("Запрос на получение данных от пользователя %s", callback.from_user.id)
     await callback.message.answer("Обработка данных ...\n"
                                   "Пожалуйста подождите\n")
     try:
 
         companies = get_companies(KEYWORD, AREA)
-        logging.info(" 1( пользователm %s)", callback.from_user.id)
-
         id_request = insert_requests_data(AREA, KEYWORD, date)
-        logging.info("2 (пользователь %s)", callback.from_user.id)
-
         for company, company_info in companies.items():
             insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
-            logging.info("3 (пользователь %s)", callback.from_user.id)
+
+        # Создаем DataFrame из списка словарей
         df = pd.DataFrame(list(companies.values()), index=companies.keys(), columns=['Сайт', 'Телефон'])
-        logging.info("DataFrame из списка словарей cоздан для пользователя %s", callback.from_user.id)
 
+        # Сохраняем DataFrame в Excel
         df.to_excel('output.xlsx', index_label='Компания')
-        logging.info("DataFrame из списка словарей сохранен для пользователя %s", callback.from_user.id)
 
+        # Открываем файл Excel
         wb = openpyxl.load_workbook('output.xlsx')
-        logging.info("Открыт файл Exce для редактирования (пользователь %s)", callback.from_user.id)
 
         # Выбираем активный лист (первый лист в книге)
         sheet = wb.active
@@ -133,11 +118,10 @@ async def get_data(callback: types.CallbackQuery):
         sheet.row_dimensions[1].height = 15
         sheet.row_dimensions[2].height = 15
 
+        # Сохраняем изменения в файл
         wb.save('output.xlsx')
-        logging.info("Сохранён файл Exce для пользователя %s", callback.from_user.id)
         absolute_path = os.path.abspath("output.xlsx")
         document = FSInputFile(absolute_path)
         await bot.send_document(chat_id=callback.from_user.id, document=document)
-        logging.info("Данные успешно отправлены пользователю %s", callback.from_user.id)
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
