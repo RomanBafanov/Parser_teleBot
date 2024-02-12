@@ -64,7 +64,6 @@ def search_response_history(city_code, title_job):
 
     except (Exception, Error) as error:
         print("Error while working with PostgreSQL:", error)
-        raise
 
     finally:
         if cursor:
