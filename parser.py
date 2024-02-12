@@ -1,11 +1,11 @@
 from datetime import datetime, timedelta
 import requests
 import re
-from multiprocessing import Pool
+
 
 def get_employer_info(url):
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url)
         response.raise_for_status()
         employer_info = response.json()
     except requests.RequestException as error:
@@ -33,20 +33,20 @@ def get_vacancies_hh(keyword, area):
             'area': area,
             'date_from': period_start.isoformat(),
             'per_page': per_page,
-            'page': page,
-            'only_with_company': True
+            'page': page
         }
-
         response = requests.get(url, params=params)
         response.raise_for_status()
 
         page_payload = response.json()
         print(f"Processing page {page}, total pages: {page_payload['pages']}")
 
-        with Pool() as pool:
-            vacancies_info.extend(pool.map(get_employer_info,
-                                           [vacancy["employer"]["url"] for vacancy in page_payload["items"]
-                                            if "employer" in vacancy and "url" in vacancy["employer"]]))
+        for vacancy in page_payload["items"]:
+            if "employer" in vacancy and "url" in vacancy["employer"]:
+                url_employer = vacancy["employer"]["url"]
+                company_data = get_employer_info(url_employer)
+                if company_data:
+                    vacancies_info.append(company_data)
 
         if page < page_payload["pages"] - 1:
             page += 1
@@ -60,12 +60,10 @@ def filter_and_create_dict(vacancies):
     filtered_companies = (company for company in vacancies if company.get('Сайт') != '')
     company_final = {}
     count_companies = 0
-
     for company in filtered_companies:
         try:
-            response = requests.get(company['Сайт'])
+            response = requests.get(company['Сайт'], timeout=5)
             response.raise_for_status()
-
             string = response.text
             pattern = '"tel:(.*?)"'
             match = re.search(pattern, string)
