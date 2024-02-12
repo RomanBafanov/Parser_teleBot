@@ -36,3 +36,39 @@ def insert_requests_data(area, keyword, date):
             connection.close()
             print("Connection to PostgreSQL closed")
     return id
+
+
+def search_requests_history():
+
+    connection = None
+    cursor = None
+
+    try:
+        connection = psycopg2.connect(user=USER,
+                                      password=PASSWORD,
+                                      host=HOST,
+                                      port=PORT,
+                                      database="parserhh_db")
+        cursor = connection.cursor()
+        select_query = """ SELECT cities.city, requests.job_title, requests.date_request
+                            FROM cities, requests
+                            WHERE cities.id_city = requests.id_city  """
+
+        cursor.execute(select_query)
+        result = cursor.fetchall()
+        return result
+
+    except (Exception, Error) as error:
+        print("Error while working with PostgreSQL:", error)
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+            print("Connection to PostgreSQL closed")
+
+
+def search_history():
+    result = search_requests_history()
+    return result
