@@ -28,6 +28,9 @@ async def parsing(callback: types.CallbackQuery):
     builder.row(types.InlineKeyboardButton(
         text="Получить данные", callback_data="Получить данные")
     )
+    builder.row(types.InlineKeyboardButton(
+        text="Основное меню", callback_data="/start")
+    )
     await callback.message.answer("Посмотрите нужный id города или начните Парсинг",
                                   reply_markup=builder.as_markup())
 
