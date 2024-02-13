@@ -23,7 +23,7 @@ def insert_response_data(id_request, company_name, site, telephone):
             INSERT INTO response (ID_REQUEST, COMPANY_NAME, SITE, TELEPHONE)
             VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(insert_query, (id_request, company_name, site or None, telephone or None))
+        cursor.execute(insert_query, (id_request, company_name, site, telephone))
         connection.commit()
 
     except (Exception, Error) as error:
