@@ -52,4 +52,35 @@ def create_all_tables():
             print("Соединение с PostgreSQL закрыто")
 
 
+def add_foreign_keys():
+    connection = psycopg2.connect(user=USER,
+                                  password=PASSWORD,
+                                  host=HOST,
+                                  port=PORT,
+                                  database=DATABASE)
+    cursor = connection.cursor()
+
+    add_foreign_key_to_requests_query = '''ALTER TABLE requests
+                                         ADD FOREIGN KEY (ID_CITY)
+                                         REFERENCES cities (ID_CITY);'''
+
+    add_foreign_key_to_response_query = '''ALTER TABLE response
+                                          ADD FOREIGN KEY (ID_REQUEST)
+                                          REFERENCES requests (ID);'''
+
+    try:
+        cursor.execute(add_foreign_key_to_requests_query)
+        cursor.execute(add_foreign_key_to_response_query)
+        connection.commit()
+        print("Связи между таблицами успешно добавлены")
+    except (Exception, Error) as error:
+        print("Ошибка добавления связей:", error)
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("Соединение с PostgreSQL закрыто")
+
+
 create_all_tables()
+add_foreign_keys()
