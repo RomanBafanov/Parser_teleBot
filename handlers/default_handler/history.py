@@ -27,7 +27,7 @@ async def get_data_history(callback: types.CallbackQuery):
     builder.row(types.InlineKeyboardButton(
         text="Назад", callback_data="История")
     )
-    await callback.message.answer("История запросов", reply_markup=builder.as_markup())
+    await callback.message.answer("История запросов:", reply_markup=builder.as_markup())
     try:
         result = search_history()
 
@@ -35,16 +35,16 @@ async def get_data_history(callback: types.CallbackQuery):
 
         sheet = wb.active
 
-        sheet.cell(row=1, column=1).value = "Компания"
-        sheet.cell(row=1, column=2).value = "Сайт"
-        sheet.cell(row=1, column=3).value = "Телефон"
+        sheet.cell(row=1, column=1).value = "Город"
+        sheet.cell(row=1, column=2).value = "Вакансия"
+        sheet.cell(row=1, column=3).value = "дата"
 
         last_row = sheet.max_row + 1  # Определение номера строки для начала заполнения данных
         for row_index, row in enumerate(result, start=last_row):
-            company, website, phone_number = row
-            sheet.cell(row=row_index, column=1).value = company
-            sheet.cell(row=row_index, column=2).value = website
-            sheet.cell(row=row_index, column=3).value = phone_number
+            city, vacancy, date_request = row
+            sheet.cell(row=row_index, column=1).value = city
+            sheet.cell(row=row_index, column=2).value = vacancy
+            sheet.cell(row=row_index, column=3).value = date_request
 
         for column in sheet.columns:
             max_length = 0
