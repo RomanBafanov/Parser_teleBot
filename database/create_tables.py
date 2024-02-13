@@ -6,7 +6,7 @@ from config_data.config import USER, PASSWORD, HOST, PORT, DATABASE
 sys.path.append(os.getcwd())
 
 
-def create_all_tables():
+def create_all_tables_and_fks():
     connection = psycopg2.connect(user=USER,
                                   password=PASSWORD,
                                   host=HOST,
@@ -37,29 +37,6 @@ def create_all_tables():
                                   FOREIGN KEY (ID_REQUEST) REFERENCES requests (ID))
                                    '''
 
-    try:
-        cursor.execute(create_city_table_query)
-        cursor.execute(create_requests_table_query)
-        cursor.execute(create_response_table_query)
-        connection.commit()
-        print("Все таблицы созданы успешно")
-    except (Exception, Error) as error:
-        print("Ошибка создания таблиц:", error)
-    finally:
-        if connection:
-            cursor.close()
-            connection.close()
-            print("Соединение с PostgreSQL закрыто")
-
-
-def add_foreign_keys():
-    connection = psycopg2.connect(user=USER,
-                                  password=PASSWORD,
-                                  host=HOST,
-                                  port=PORT,
-                                  database=DATABASE)
-    cursor = connection.cursor()
-
     add_foreign_key_to_requests_query = '''ALTER TABLE requests
                                          ADD FOREIGN KEY (ID_CITY)
                                          REFERENCES cities (ID_CITY);'''
@@ -69,12 +46,15 @@ def add_foreign_keys():
                                           REFERENCES requests (ID);'''
 
     try:
+        cursor.execute(create_city_table_query)
+        cursor.execute(create_requests_table_query)
+        cursor.execute(create_response_table_query)
         cursor.execute(add_foreign_key_to_requests_query)
         cursor.execute(add_foreign_key_to_response_query)
         connection.commit()
-        print("Связи между таблицами успешно добавлены")
+        print("Все таблицы и связи успешно созданы")
     except (Exception, Error) as error:
-        print("Ошибка добавления связей:", error)
+        print("Ошибка создания таблиц и связей:", error)
     finally:
         if connection:
             cursor.close()
@@ -82,5 +62,4 @@ def add_foreign_keys():
             print("Соединение с PostgreSQL закрыто")
 
 
-create_all_tables()
-add_foreign_keys()
+create_all_tables_and_fks()
