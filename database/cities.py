@@ -2,7 +2,7 @@ import os
 import sys
 import psycopg2
 from psycopg2 import Error
-from config_data.config import USER, PASSWORD, HOST, PORT
+from config_data.config import USER, PASSWORD, HOST, PORT, DATABASE
 sys.path.append(os.getcwd())
 
 
@@ -15,7 +15,7 @@ def search_cities():
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="parserhh_db")
+                                      database=DATABASE)
         cursor = connection.cursor()
         cursor.execute(f'''SELECT id_city, city 
                             FROM cities''')
