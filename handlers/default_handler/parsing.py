@@ -94,11 +94,10 @@ async def get_data(callback: types.CallbackQuery):
     await callback.message.answer("Обработка данных ...\n"
                                   "Пожалуйста подождите\n")
     try:
-
-        companies = get_companies(KEYWORD, AREA)
-        id_request = insert_requests_data(AREA, KEYWORD, date)
+        companies = await get_companies(KEYWORD, AREA)
+        id_request = await insert_requests_data(AREA, KEYWORD, date)
         for company, company_info in companies.items():
-            insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
+            await insert_response_data(id_request, company, company_info['Сайт'], company_info['Телефон'])
 
         # Создаем DataFrame из списка словарей
         df = pd.DataFrame(list(companies.values()), index=companies.keys(), columns=['Сайт', 'Телефон'])
