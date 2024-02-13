@@ -2,7 +2,7 @@ import sys
 import os
 import psycopg2
 from psycopg2 import Error
-from config_data.config import USER, PASSWORD, HOST, PORT
+from config_data.config import USER, PASSWORD, HOST, PORT, DATABASE
 sys.path.append(os.getcwd())
 
 
@@ -16,7 +16,7 @@ def insert_response_data(id_request, company_name, site, telephone):
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="parserhh_db")
+                                      database=DATABASE)
         cursor = connection.cursor()
 
         insert_query = """
@@ -48,7 +48,7 @@ def search_response_history(city_code, title_job):
                                       password=PASSWORD,
                                       host=HOST,
                                       port=PORT,
-                                      database="parserhh_db")
+                                      database=DATABASE)
         cursor = connection.cursor()
         select_query = f"""
         SELECT company_name, site, telephone

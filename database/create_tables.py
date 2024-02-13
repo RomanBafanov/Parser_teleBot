@@ -2,7 +2,7 @@ import sys
 import os
 import psycopg2
 from psycopg2 import Error
-from config_data.config import USER, PASSWORD, HOST, PORT
+from config_data.config import USER, PASSWORD, HOST, PORT, DATABASE
 sys.path.append(os.getcwd())
 
 
@@ -11,7 +11,7 @@ def create_all_tables():
                                   password=PASSWORD,
                                   host=HOST,
                                   port=PORT,
-                                  database="parserhh_db")
+                                  database=DATABASE)
     cursor = connection.cursor()
 
     create_city_table_query = '''CREATE TABLE cities
